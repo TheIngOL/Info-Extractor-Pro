@@ -1,5 +1,5 @@
 [general]
-name=Info Extractor Pro qt6
+name=Info Extractor Pro
 description=Universal Query Tool for WMS/WFS | Universal-Abfragetool für WMS und WFS Layer mit Exportfunktion.
 about=This plugin enables simultaneous querying of attribute data from all visible WMS and WFS layers via a point click.
   Features:
@@ -39,3 +39,4 @@ deprecated=False
 homepage=https://github.com/TheIngOL
 supportsQt6=True
 changelog= 13.03.2026 - Dual-Compatible (Qt5 & Qt6)
+
