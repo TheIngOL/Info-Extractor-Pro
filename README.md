@@ -1,5 +1,5 @@
 # Info-Extractor-Pro
-Universal-Abfragetool für WMS und WFS Layer mit Exportfunktion | Universal Query Tool for WMS/WFS 
+Universal-Abfragetool für WMS und WFS Layer mit Exportfunktion 
 
 Dieses Plugin ermöglicht die gleichzeitige Abfrage von Sachdaten aus allen sichtbaren WMS- und WFS-Layern per Punktklick. 
   Features:
@@ -9,6 +9,8 @@ Dieses Plugin ermöglicht die gleichzeitige Abfrage von Sachdaten aus allen sich
   - Kopieren der Koordinaten in die Zwischenablage.
   - Export der Ergebnisse als strukturierte Textdatei.
 ---
+Universal Query Tool for WMS/WFS 
+
 This plugin enables simultaneous querying of attribute data from all visible WMS and WFS layers via a point click.
   Features:
   - Automatic identification of raster (WMS) and vector (WFS) data.
