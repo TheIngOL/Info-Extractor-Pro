@@ -1,0 +1,40 @@
+[general]
+name=Info Extractor Pro
+description=Universal Query Tool for WMS/WFS | Universal-Abfragetool für WMS und WFS Layer mit Exportfunktion.
+about=This plugin enables simultaneous querying of attribute data from all visible WMS and WFS layers via a point click.
+  Features:
+  - Automatic identification of raster (WMS) and vector (WFS) data.
+  - Extraction of point coordinates and CRS information.
+  - Theme support (optimized for Dark and Light modes).
+  - Copy coordinates to clipboard.
+  - Export results as a structured text file.
+
+ Developed with AI assistance (Google Gemini) for code optimization and logic structure.
+
+ ---
+
+ Dieses Plugin ermöglicht die gleichzeitige Abfrage von Sachdaten aus allen sichtbaren WMS- und WFS-Layern per Punktklick.
+  Features:
+  - Automatische Identifizierung von Raster- (WMS) und Vektordaten (WFS).
+  - Extraktion von Punktkoordinaten und KBS-Informationen.
+  - Theme-Unterstützung (optimiert für Dark- und Light-Mode).
+  - Kopieren der Koordinaten in die Zwischenablage.
+  - Export der Ergebnisse als strukturierte Textdatei.
+
+ Erstellt mit Unterstützung von KI (Google Gemini) zur Code-Optimierung und Logik-Strukturierung.
+
+version=1.1
+qgisMinimumVersion=3.40
+author=Tobias Herden
+email=tobias.herden@ing-oldenburg.de
+hasProcessingProvider=no
+repository=https://github.com/TheIngOL/Info-Extractor-Pro
+category=plugin
+tags=WMS, WFS, vector, raster, python, data, export, coordinates
+icon=icon.png
+experimental=False
+server=False
+deprecated=False
+homepage=https://github.com/TheIngOL
+supportsQt6=False
+changelog=
