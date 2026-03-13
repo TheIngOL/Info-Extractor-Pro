@@ -3,6 +3,7 @@
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
 # Date: 2026-03-13
+# Qt Version: Dual-Compatible (Qt5 & Qt6)
 # --------------------------------------------------------
 
 from qgis.gui import QgsMapToolEmitPoint
@@ -20,7 +21,7 @@ class PointTool(QgsMapToolEmitPoint):
         
         pathcurser = os.path.join(os.path.dirname(__file__), 'crosshair.png')
         pixmap = QPixmap(pathcurser)
-        pixmap = pixmap.scaled(24, 24, Qt.KeepAspectRatio)
+        pixmap = pixmap.scaled(24, 24, Qt.AspectRatioMode.KeepAspectRatio)
         self.setCursor(QCursor(pixmap))
 
     def canvasReleaseEvent(self, event):
