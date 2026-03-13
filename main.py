@@ -3,6 +3,7 @@
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
 # Date: 2026-03-13
+# Qt Version: Dual-Compatible (Qt5 & Qt6)
 # --------------------------------------------------------
 
 import os
@@ -26,10 +27,17 @@ class ResultDialog(QDialog):
         layout = QVBoxLayout(self)
         self.browser = QTextBrowser()
         
-        # Theme-Anpassung für Dark/Light Mode
+        # --- Qt6-Fix: QPalette Roles ---
         palette = self.palette()
-        bg_color = palette.color(QPalette.Base).name()
-        text_color = palette.color(QPalette.Text).name()
+        try:
+            bg_role = QPalette.ColorRole.Base
+            text_role = QPalette.ColorRole.Text
+        except AttributeError:
+            bg_role = QPalette.Base
+            text_role = QPalette.Text
+
+        bg_color = palette.color(bg_role).name()
+        text_color = palette.color(text_role).name()
 
         style = f"""
         <style>
@@ -44,15 +52,26 @@ class ResultDialog(QDialog):
         self.browser.setHtml(style + html_content)
         layout.addWidget(self.browser)
 
-        # Button Box
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok)
+        # --- Qt6-Fix: QDialogButtonBox StandardButtons ---
+        try:
+            ok_button = QDialogButtonBox.StandardButton.Ok
+        except AttributeError:
+            ok_button = QDialogButtonBox.Ok
+
+        self.button_box = QDialogButtonBox(ok_button)
         
+        # --- Qt6-Fix: QDialogButtonBox ButtonRole ---
+        try:
+            action_role = QDialogButtonBox.ButtonRole.ActionRole
+        except AttributeError:
+            action_role = QDialogButtonBox.ActionRole
+
         # Kopier-Button
-        self.copy_button = self.button_box.addButton("Koordinaten kopieren", QDialogButtonBox.ActionRole)
+        self.copy_button = self.button_box.addButton("Koordinaten kopieren", action_role)
         self.copy_button.clicked.connect(self.copy_to_clipboard)
         
         # Export-Button
-        self.export_button = self.button_box.addButton("Daten exportieren (.txt)", QDialogButtonBox.ActionRole)
+        self.export_button = self.button_box.addButton("Daten exportieren (.txt)", action_role)
         self.export_button.clicked.connect(self.export_data)
         
         self.button_box.accepted.connect(self.accept)
@@ -60,14 +79,16 @@ class ResultDialog(QDialog):
 
     def copy_to_clipboard(self):
         QApplication.clipboard().setText(self.coords_to_copy)
-        # Optional: Kleines Feedback geben
         print(f"Kopiert: {self.coords_to_copy}")
 
     def export_data(self):
         file_path, _ = QFileDialog.getSaveFileName(self, "Ergebnis speichern", "abfrage_ergebnis.txt", "Text (*.txt)")
         if file_path:
-            with open(file_path, 'w', encoding='utf-8') as f:
-                f.write(self.browser.toPlainText())
+            try:
+                with open(file_path, 'w', encoding='utf-8') as f:
+                    f.write(self.browser.toPlainText())
+            except Exception as e:
+                print(f"Export-Fehler: {e}")
 
 class InfoExtractor:
     def __init__(self, iface):
@@ -98,8 +119,12 @@ class InfoExtractor:
         return html
 
     def process_point(self, point):
-        # Sanduhr aktivieren
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        # --- Qt6-Fix: Cursor Shape ---
+        try:
+            QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
+        except AttributeError:
+            QApplication.setOverrideCursor(Qt.WaitCursor)
+
         self.iface.statusBarIface().showMessage("Abfrage läuft...")
 
         try:
@@ -116,9 +141,8 @@ class InfoExtractor:
             
             layers = self.canvas.layers()
             for layer in layers:
-                QCoreApplication.processEvents() # UI wach halten
+                QCoreApplication.processEvents()
 
-                # --- WMS ---
                 if layer.type() == layer.RasterLayer:
                     provider = layer.dataProvider()
                     if not (provider.capabilities() & provider.Identify):
@@ -132,9 +156,8 @@ class InfoExtractor:
                         content = list(res.results().values())[0]
                         if content and len(str(content).strip()) > 15:
                             results.append(f"<hr><b class='layer-title'>Layer: {layer.name()}</b><br>{self.clean_html(str(content))}")
-                            time.sleep(0.02) # Kurze Pause zur Stabilisierung
+                            time.sleep(0.02)
 
-                # --- WFS ---
                 elif layer.type() == layer.VectorLayer:
                     tolerance = self.canvas.mapUnitsPerPixel() * 10
                     rect = QgsGeometry.fromPointXY(point).buffer(tolerance, 5).boundingBox()
@@ -151,14 +174,16 @@ class InfoExtractor:
                         results.append(f"<hr><b class='layer-title'>Layer: {layer.name()}</b>" + "".join(layer_data[:10]))
 
         finally:
-            # Sanduhr beenden, bevor der Dialog kommt
             QApplication.restoreOverrideCursor()
             self.iface.statusBarIface().clearMessage()
 
-        
         self.show_custom_dialog("Ergebnisse der Abfrage", "".join(results), coords_str)
 
-    
     def show_custom_dialog(self, title, html_text, coords_str):
         dialog = ResultDialog(title, html_text, coords_str, self.iface.mainWindow())
-        dialog.exec_()
+        
+        # Dual-Kompatibilität für exec() (Qt6) und exec_() (Qt5)
+        if hasattr(dialog, 'exec'):
+            dialog.exec()
+        else:
+            dialog.exec_()
