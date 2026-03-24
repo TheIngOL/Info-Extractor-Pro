@@ -1,5 +1,9 @@
 [general]
 name=Info Extractor Pro
+email=tobias.herden@ing-oldenburg.de
+author=Tobias Herden
+qgisMinimumVersion=3.40
+qgisMaximumVersion=4.99
 description=Universal Query Tool for WMS/WFS | Universal-Abfragetool für WMS und WFS Layer mit Exportfunktion.
 about=This plugin enables simultaneous querying of attribute data from all visible WMS and WFS layers via a point click.
   Features:
@@ -23,21 +27,22 @@ about=This plugin enables simultaneous querying of attribute data from all visib
 
  Erstellt mit Unterstützung von KI (Google Gemini) zur Code-Optimierung und Logik-Strukturierung.
 
-version=2.0
-qgisMinimumVersion=3.40
-qgisMaximumVersion=4.99
-author=Tobias Herden
-email=tobias.herden@ing-oldenburg.de
-hasProcessingProvider=no
+version=2.0.4
+tracker=https://github.com/TheIngOL/Info-Extractor-Pro/issues
 repository=https://github.com/TheIngOL/Info-Extractor-Pro
+
+
+hasProcessingProvider=no
 category=Plugins
 tags=WMS, WFS, vector, raster, python, data, export, coordinates
 icon=icon.png
 experimental=False
 server=False
 deprecated=False
-homepage=https://github.com/TheIngOL
-supportsQt6=True
-changelog=2.0 Qt Version Dual-Compatible (Qt5 & Qt6) (für QGIS 4)
+homepage=https://github.com/TheIngOL/Info-Extractor-Pro
+changelog=2.0.3 & 2.0.4 ... improved WMS 'GetFeatureInfo' precision for small point symbols and icons.
+   2.0.2 ... updated the homepage link
+   2.0.1 ... Deleted the supportsQt6 flag in the metadata.txt
+   2.0.0 ... Qt Version Dual-Compatible (Qt5 & Qt6) (für QGIS 4)
 
 
