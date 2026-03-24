@@ -2,7 +2,7 @@
 # Info Extractor Pro
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
-# Date: 2026-03-13
+# Date: 2026-03-24
 # Qt Version: Dual-Compatible (Qt5 & Qt6)
 # --------------------------------------------------------
 
@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QPalette
 from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QTextBrowser, 
                              QDialogButtonBox, QFileDialog, QApplication)
-from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry
+from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle
 from .point_tool import PointTool
 
 class ResultDialog(QDialog):
@@ -52,7 +52,7 @@ class ResultDialog(QDialog):
         self.browser.setHtml(style + html_content)
         layout.addWidget(self.browser)
 
-        # --- Qt6-Fix: QDialogButtonBox StandardButtons ---
+        # QDialogButtonBox StandardButtons
         try:
             ok_button = QDialogButtonBox.StandardButton.Ok
         except AttributeError:
@@ -60,7 +60,7 @@ class ResultDialog(QDialog):
 
         self.button_box = QDialogButtonBox(ok_button)
         
-        # --- Qt6-Fix: QDialogButtonBox ButtonRole ---
+        # QDialogButtonBox ButtonRole
         try:
             action_role = QDialogButtonBox.ButtonRole.ActionRole
         except AttributeError:
@@ -147,10 +147,27 @@ class InfoExtractor:
                     provider = layer.dataProvider()
                     if not (provider.capabilities() & provider.Identify):
                         continue
-                        
-                    res = provider.identify(point, QgsRaster.IdentifyFormatHtml)
+                    
+                    pixel_size = self.canvas.mapUnitsPerPixel()
+                    tolerance_units = pixel_size * 10  # 10 Pixel Puffer
+                    
+                    search_area = QgsRectangle(
+                        point.x() - tolerance_units,
+                        point.y() - tolerance_units,
+                        point.x() + tolerance_units,
+                        point.y() + tolerance_units
+                    )
+
+                    res = provider.identify(point, 
+                                            QgsRaster.IdentifyFormatHtml, 
+                                            search_area, 
+                                            10, 10)
+                    
                     if not res.isValid() or not res.results():
-                        res = provider.identify(point, QgsRaster.IdentifyFormatText)
+                        res = provider.identify(point, 
+                                                QgsRaster.IdentifyFormatText, 
+                                                search_area, 
+                                                10, 10)
                     
                     if res.isValid() and res.results():
                         content = list(res.results().values())[0]
