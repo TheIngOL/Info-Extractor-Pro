@@ -2,8 +2,7 @@
 # Info Extractor Pro
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
-# Date: 2026-03-13
-# Qt Version: Dual-Compatible (Qt5 & Qt6)
+# Date: 2026-03-24
 # --------------------------------------------------------
 
 from qgis.gui import QgsMapToolEmitPoint
@@ -17,10 +16,9 @@ class PointTool(QgsMapToolEmitPoint):
         super().__init__(canvas)
         self.canvas = canvas
         self.callback = callback
-        
-        
-        pathcurser = os.path.join(os.path.dirname(__file__), 'crosshair.png')
-        pixmap = QPixmap(pathcurser)
+         
+        pathcursor = os.path.join(os.path.dirname(__file__), 'crosshair.png')
+        pixmap = QPixmap(pathcursor)
         pixmap = pixmap.scaled(24, 24, Qt.AspectRatioMode.KeepAspectRatio)
         self.setCursor(QCursor(pixmap))
 
