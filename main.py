@@ -11,10 +11,10 @@ import re
 import datetime
 import time
 from qgis.PyQt.QtCore import Qt, QCoreApplication
-from qgis.PyQt.QtGui import QIcon, QPalette
+from qgis.PyQt.QtGui import QIcon, QPalette, QColor
 from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QTextBrowser, 
-                             QDialogButtonBox, QFileDialog, QApplication)
-from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle, QgsCoordinateTransform, QgsProject
+                             QDialogButtonBox, QFileDialog, QApplication, QColorDialog)
+from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle, QgsCoordinateTransform, QgsProject, QgsSettings
 from .point_tool import PointTool
 
 class ResultDialog(QDialog):
@@ -95,22 +95,54 @@ class InfoExtractor:
         self.iface = iface
         self.canvas = iface.mapCanvas()
         self.action = None
+        self.color_action = None
 
     def initGui(self):
         icon_path = os.path.join(os.path.dirname(__file__), 'icon.png')
-        self.action = QAction(QIcon(icon_path), "WMS/WFS Abfrage", self.iface.mainWindow())
+        
+        # Hauptaktion (Abfrage Tool)
+        self.action = QAction(QIcon(icon_path), "Info Extractor Pro", self.iface.mainWindow())
+        
+        # NEU: Shortcut setzen (z. B. Strg + I)
+        self.action.setShortcut("Ctrl+I")
+        
         self.action.triggered.connect(self.activate_tool)
         self.iface.addToolBarIcon(self.action)
-        self.iface.addPluginToMenu("&Info Tools", self.action)
+        self.iface.addPluginToMenu("Info Extractor Pro", self.action)
+        
+        # Aktion für die Farbeinstellungen
+        self.color_action = QAction("change cursor color...", self.iface.mainWindow())
+        self.color_action.triggered.connect(self.change_cursor_color)
+        self.iface.addPluginToMenu("Info Extractor Pro", self.color_action)
 
     def unload(self):
         if self.action:
             self.iface.removeToolBarIcon(self.action)
-            self.iface.removePluginMenu("&Info Tools", self.action)
+            self.iface.removePluginMenu("Info Extractor Pro", self.action)
+        if hasattr(self, 'color_action') and self.color_action:
+            self.iface.removePluginMenu("Info Extractor Pro", self.color_action)
 
     def activate_tool(self):
         self.point_tool = PointTool(self.canvas, self.process_point)
         self.canvas.setMapTool(self.point_tool)
+
+    def change_cursor_color(self):
+        settings = QgsSettings()
+        current_color_hex = settings.value("InfoExtractorPro/cursor_color", "#FF0000")
+        current_color = QColor(current_color_hex)
+        
+        # Öffnet den nativen Qt-Farbwahldialog
+        new_color = QColorDialog.getColor(current_color, self.iface.mainWindow(), "Cursor-Color")
+        
+        if new_color.isValid():
+            # Speichert die gewählte Farbe als Hex-String in QGIS
+            settings.setValue("InfoExtractorPro/cursor_color", new_color.name())
+            self.iface.messageBar().pushMessage("Info Extractor Pro", "Cursor-Color succesfully changed.", level=0, duration=3)
+
+            if hasattr(self, 'point_tool') and self.canvas.mapTool() == self.point_tool:
+                self.activate_tool()
+                
+            self.iface.messageBar().pushMessage("Info Extractor Pro", "Fadenkreuz-Farbe erfolgreich geändert.", level=0, duration=3)
 
     def clean_html(self, html):
         if not html: return ""
