@@ -10,7 +10,7 @@ about=This plugin enables simultaneous querying of attribute data from all visib
   - Automatic identification of raster (WMS) and vector (WFS) data.
   - Extraction of point coordinates and CRS information.
   - Theme support (optimized for Dark and Light modes).
-  - cursor color is adjustable
+  - Cursor color is adjustable
   - Copy coordinates to clipboard.
   - Export results as a structured text file.
 
