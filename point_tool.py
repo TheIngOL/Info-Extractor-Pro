@@ -2,7 +2,7 @@
 # Info Extractor Pro
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
-# Date: 2026-03-24
+# Date: 2026-05-22
 # --------------------------------------------------------
 
 import os
@@ -28,9 +28,14 @@ class PointTool(QgsMapToolEmitPoint):
         color_hex = settings.value("InfoExtractorPro/cursor_color", "#FF0000") 
         color = QColor(color_hex)
         
-        # Bild einfärben (überschreibt nur die nicht-transparenten Pixel)
+        try:
+            comp_mode = QPainter.CompositionMode.CompositionMode_SourceIn
+        except AttributeError:
+            comp_mode = QPainter.CompositionMode_SourceIn # Fallback für ältere PyQt5 Versionen
+            
+        # Bild dynamisch einfärben
         painter = QPainter(pixmap)
-        painter.setCompositionMode(QPainter.CompositionMode_SourceIn) 
+        painter.setCompositionMode(comp_mode) 
         painter.fillRect(pixmap.rect(), color)
         painter.end()
         # -------------------------------------------------
