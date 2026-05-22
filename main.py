@@ -2,7 +2,7 @@
 # Info Extractor Pro
 # Created by: Tobias Herden
 # Assistance: Logic and structure partially generated/refined using AI (Google Gemini)
-# Date: 2026-03-24
+# Date: 2026-05-22
 # Qt Version: Dual-Compatible (Qt5 & Qt6)
 # --------------------------------------------------------
 
@@ -14,7 +14,7 @@ from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QPalette
 from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QTextBrowser, 
                              QDialogButtonBox, QFileDialog, QApplication)
-from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle
+from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle, QgsCoordinateTransform, QgsProject
 from .point_tool import PointTool
 
 class ResultDialog(QDialog):
@@ -130,7 +130,8 @@ class InfoExtractor:
         try:
             now = datetime.datetime.now().strftime("%d.%m.%Y %H:%M:%S")
             coords_str = f"Ost: {point.x():.3f}, Nord: {point.y():.3f}"
-            kbs = self.canvas.mapSettings().destinationCrs().authid()
+            project_crs = self.canvas.mapSettings().destinationCrs()
+            kbs = project_crs.authid()
             
             results = [
                 f"<h3>Abfrage-Protokoll</h3>",
@@ -142,6 +143,17 @@ class InfoExtractor:
             layers = self.canvas.layers()
             for layer in layers:
                 QCoreApplication.processEvents()
+
+                # Transformationsobjekt für den aktuellen Layer erstellen
+                layer_crs = layer.crs()
+                transform = QgsCoordinateTransform(project_crs, layer_crs, QgsProject.instance())
+                
+                try:
+                    # Klickpunkt in das Layer-KBS transformieren
+                    layer_point = transform.transform(point)
+                except Exception:
+                    # Überspringen, falls Punkt außerhalb der mathematischen KBS-Grenzen liegt
+                    continue
 
                 if layer.type() == layer.RasterLayer:
                     provider = layer.dataProvider()
@@ -157,16 +169,22 @@ class InfoExtractor:
                         point.x() + tolerance_units,
                         point.y() + tolerance_units
                     )
+                    
+                    try:
+                        # Suchbereich-BBox in das Layer-KBS transformieren
+                        layer_search_area = transform.transformBoundingBox(search_area)
+                    except Exception:
+                        continue
 
-                    res = provider.identify(point, 
+                    res = provider.identify(layer_point, 
                                             QgsRaster.IdentifyFormatHtml, 
-                                            search_area, 
+                                            layer_search_area, 
                                             10, 10)
                     
                     if not res.isValid() or not res.results():
-                        res = provider.identify(point, 
+                        res = provider.identify(layer_point, 
                                                 QgsRaster.IdentifyFormatText, 
-                                                search_area, 
+                                                layer_search_area, 
                                                 10, 10)
                     
                     if res.isValid() and res.results():
@@ -178,7 +196,14 @@ class InfoExtractor:
                 elif layer.type() == layer.VectorLayer:
                     tolerance = self.canvas.mapUnitsPerPixel() * 10
                     rect = QgsGeometry.fromPointXY(point).buffer(tolerance, 5).boundingBox()
-                    request = QgsFeatureRequest().setFilterRect(rect).setFlags(QgsFeatureRequest.NoGeometry)
+                    
+                    try:
+                        # Suchbereich-BBox in das Layer-KBS transformieren
+                        layer_rect = transform.transformBoundingBox(rect)
+                    except Exception:
+                        continue
+                        
+                    request = QgsFeatureRequest().setFilterRect(layer_rect).setFlags(QgsFeatureRequest.NoGeometry)
                     features = layer.getFeatures(request)
                     
                     layer_data = []
