@@ -12,9 +12,15 @@ import datetime
 import time
 from qgis.PyQt.QtCore import Qt, QCoreApplication
 from qgis.PyQt.QtGui import QIcon, QPalette, QColor
-from qgis.PyQt.QtWidgets import (QAction, QDialog, QVBoxLayout, QTextBrowser, 
+from qgis.PyQt.QtWidgets import (QDialog, QVBoxLayout, QTextBrowser, 
                              QDialogButtonBox, QFileDialog, QApplication, QColorDialog)
-from qgis.core import QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle, QgsCoordinateTransform, QgsProject, QgsSettings
+
+try:
+    from qgis.PyQt.QtGui import QAction
+except ImportError:
+    from qgis.PyQt.QtWidgets import QAction
+
+from qgis.core import Qgis, QgsRaster, QgsFeatureRequest, QgsGeometry, QgsRectangle, QgsCoordinateTransform, QgsProject, QgsSettings
 from .point_tool import PointTool
 
 class ResultDialog(QDialog):
@@ -137,12 +143,17 @@ class InfoExtractor:
         if new_color.isValid():
             # Speichert die gewählte Farbe als Hex-String in QGIS
             settings.setValue("InfoExtractorPro/cursor_color", new_color.name())
-            self.iface.messageBar().pushMessage("Info Extractor Pro", "Cursor-Color succesfully changed.", level=0, duration=3)
 
             if hasattr(self, 'point_tool') and self.canvas.mapTool() == self.point_tool:
                 self.activate_tool()
                 
-            self.iface.messageBar().pushMessage("Info Extractor Pro", "Fadenkreuz-Farbe erfolgreich geändert.", level=0, duration=3)
+            # --- Qt6-Fix: Typensichere Enums für MessageLevel ---
+            self.iface.messageBar().pushMessage(
+                "Info Extractor Pro", 
+                "Fadenkreuz-Farbe erfolgreich geändert.", 
+                level=Qgis.MessageLevel.Info, 
+                duration=3
+            )
 
     def clean_html(self, html):
         if not html: return ""
@@ -235,7 +246,13 @@ class InfoExtractor:
                     except Exception:
                         continue
                         
-                    request = QgsFeatureRequest().setFilterRect(layer_rect).setFlags(QgsFeatureRequest.NoGeometry)
+                    # --- Qt6-Fix: Strenge Enums für QgsFeatureRequest ---
+                    try:
+                        no_geom_flag = QgsFeatureRequest.Flag.NoGeometry
+                    except AttributeError:
+                        no_geom_flag = QgsFeatureRequest.NoGeometry
+                        
+                    request = QgsFeatureRequest().setFilterRect(layer_rect).setFlags(no_geom_flag)
                     features = layer.getFeatures(request)
                     
                     layer_data = []
