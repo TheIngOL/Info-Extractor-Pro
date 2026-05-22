@@ -27,7 +27,7 @@ about=This plugin enables simultaneous querying of attribute data from all visib
 
  Erstellt mit Unterstützung von KI (Google Gemini) zur Code-Optimierung und Logik-Strukturierung.
 
-version=2.0.4
+version=2.1.0
 tracker=https://github.com/TheIngOL/Info-Extractor-Pro/issues
 repository=https://github.com/TheIngOL/Info-Extractor-Pro
 
@@ -40,9 +40,8 @@ experimental=False
 server=False
 deprecated=False
 homepage=https://github.com/TheIngOL/Info-Extractor-Pro
-changelog=2.0.3 & 2.0.4 ... improved WMS 'GetFeatureInfo' precision for small point symbols and icons.
+changelog=2.1.0 ... Added on-the-fly CRS transformation to correctly query layers with a different CRS than the project 
+   2.0.3 & 2.0.4 ... improved WMS 'GetFeatureInfo' precision for small point symbols and icons.
    2.0.2 ... updated the homepage link
    2.0.1 ... Deleted the supportsQt6 flag in the metadata.txt
    2.0.0 ... Qt Version Dual-Compatible (Qt5 & Qt6) (für QGIS 4)
-
-
