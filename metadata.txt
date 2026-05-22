@@ -10,6 +10,7 @@ about=This plugin enables simultaneous querying of attribute data from all visib
   - Automatic identification of raster (WMS) and vector (WFS) data.
   - Extraction of point coordinates and CRS information.
   - Theme support (optimized for Dark and Light modes).
+  - cursor color is adjustable
   - Copy coordinates to clipboard.
   - Export results as a structured text file.
 
@@ -22,6 +23,7 @@ about=This plugin enables simultaneous querying of attribute data from all visib
   - Automatische Identifizierung von Raster- (WMS) und Vektordaten (WFS).
   - Extraktion von Punktkoordinaten und KBS-Informationen.
   - Theme-Unterstützung (optimiert für Dark- und Light-Mode).
+  - Cursor Farbe ist anpassbar
   - Kopieren der Koordinaten in die Zwischenablage.
   - Export der Ergebnisse als strukturierte Textdatei.
 
@@ -40,7 +42,8 @@ experimental=False
 server=False
 deprecated=False
 homepage=https://github.com/TheIngOL/Info-Extractor-Pro
-changelog=2.1.0 ... Added on-the-fly CRS transformation to correctly query layers with a different CRS than the project 
+changelog=2.1.0 ... Added on-the-fly CRS transformation to correctly query layers with a different CRS than the project,
+					the cursor color is now adjustable via the settings
    2.0.3 & 2.0.4 ... improved WMS 'GetFeatureInfo' precision for small point symbols and icons.
    2.0.2 ... updated the homepage link
    2.0.1 ... Deleted the supportsQt6 flag in the metadata.txt
